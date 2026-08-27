@@ -1,0 +1,24 @@
+
+
+import email
+
+from pytest import Session
+from sqlalchemy import select
+from app.db.schemas import UserRead
+from .models import *
+from app.db import models
+
+def create_user(db: Session, name: str, email: str, password_hash: str ) -> User:
+    new_user = models.User(
+        name=name,
+        email=email,
+        password_hash = password_hash
+    )
+    db.add(new_user)
+    db.flush()
+    return new_user
+
+def get_user_by_email(db: Session, email):
+    stmt = select(User).where(User.email == email)
+    user = db.scalar(stmt)
+    return user
