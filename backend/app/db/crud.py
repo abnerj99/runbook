@@ -18,7 +18,12 @@ def create_user(db: Session, name: str, email: str, password_hash: str ) -> User
     db.flush()
     return new_user
 
-def get_user_by_email(db: Session, email):
+def get_user_by_email(db: Session, email: str):
     stmt = select(User).where(User.email == email)
+    user = db.scalar(stmt)
+    return user
+
+def get_user_by_id(db: Session, user_id: int):
+    stmt = select(User).where(User.id == int(user_id))
     user = db.scalar(stmt)
     return user
