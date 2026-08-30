@@ -4,7 +4,7 @@ import email
 
 from pytest import Session
 from sqlalchemy import select
-from app.db.schemas import UserRead
+from app.schemas.user import UserRead
 from .models import *
 from app.db import models
 

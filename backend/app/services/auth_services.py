@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException
 from pytest import Session
 
 from app.db.crud import create_user, get_user_by_email, get_user_by_id
-from app.db.schemas import UserCreate, UserLogin
+from app.schemas.user import UserCreate, UserLogin
 from app.db.session import get_db
 from app.services.errors import InvalidCredentialsError
 from app.services.token import create_access_token, verify_access_token

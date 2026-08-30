@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db.schemas import UserRead
+from app.schemas.user import UserRead
 from .db.database import Base, engine
 from .db.session import get_db, Session
 from sqlalchemy import select
