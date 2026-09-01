@@ -8,6 +8,8 @@ from app.services.auth_services import register_user, verify_credentials, get_cu
 from app.db.models import *
 from app.db.session import Session, get_db
 from app.services.errors import InvalidCredentialsError
+from app.db.crud import create_user_project
+from app.schemas.projects import ProjectCreate, ProjectResponse
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -39,6 +41,5 @@ def login_user(
 @router.get("/users/me", response_model=UserRead)
 def get_user(user = Depends(get_current_user)):
     return user
-
 
 

@@ -27,3 +27,13 @@ def get_user_by_id(db: Session, user_id: int):
     stmt = select(User).where(User.id == int(user_id))
     user = db.scalar(stmt)
     return user
+
+def create_user_project(db: Session, user_id: int, name: str, description: str | None):
+    new_project = models.Project(
+        owner_id = user_id,
+        name=name,
+        description=description
+    )
+    db.add(new_project)
+    db.flush()
+    return new_project
