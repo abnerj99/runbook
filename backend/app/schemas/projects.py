@@ -6,7 +6,8 @@ class ProjectCreate(BaseModel):
     description: str | None
 
 class ProjectResponse(BaseModel):
+    id: int
     name: str
-    description: str 
+    description: str
     created_at: datetime
     updated_at: datetime

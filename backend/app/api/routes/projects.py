@@ -8,7 +8,7 @@ from app.db.models import *
 from app.db.session import Session, get_db
 from app.services.errors import InvalidCredentialsError
 from app.schemas.projects import ProjectCreate, ProjectResponse
-from app.db.crud import create_user_project
+from app.db.crud import create_user_project, get_all_user_projects, get_user_project
 from app.schemas.user import UserRead
 
 router = APIRouter()
@@ -32,7 +32,22 @@ def create_project(data: ProjectCreate, db: Session = Depends(get_db),user = Dep
                  detail="Failed to create project."
             )
 
-@router.get("/projects", response_model=ProjectResponse)
-def get_projects(user = Depends(get_current_user), db: Session = Depends(get_db)):
-    pass
-    
+@router.get("/projects", response_model=list[ProjectResponse])
+def get_all_projects(user = Depends(get_current_user), db: Session = Depends(get_db)):
+    projects = get_all_user_projects(db=db, user_id=user.id)
+    return projects
+
+@router.get("/projects/{project_id}", response_model=ProjectResponse)
+def get_project(project_id: int, user = Depends(get_current_user), db: Session = Depends(get_db)):
+     
+    project = get_user_project(
+            requested_id=project_id,
+            user_id=user.id,
+            db=db
+    )
+    if project is None:
+         raise HTTPException(
+              status_code=404,
+              detail="Project not found."
+         )
+    return project
