@@ -45,7 +45,7 @@ def get_all_user_projects(db: Session, user_id:int):
     return projects
 
 def get_user_project(requested_id: int,user_id: int, db: Session):
-    # User owns project, project.id matches project_id
+    # User owns project, project.id matches requested_id
     stmt = select(Project).where(Project.owner_id == user_id, Project.id == requested_id)
     project = db.scalar(stmt)
 

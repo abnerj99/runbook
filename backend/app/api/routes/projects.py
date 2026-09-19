@@ -39,14 +39,14 @@ def get_all_projects(user = Depends(get_current_user), db: Session = Depends(get
 
 @router.get("/projects/{project_id}", response_model=ProjectResponse)
 def get_project(project_id: int, user = Depends(get_current_user), db: Session = Depends(get_db)):
-     
+    #Ownership check via crud.py operations.
     project = get_user_project(
             requested_id=project_id,
             user_id=user.id,
             db=db
     )
     if project is None:
-         raise HTTPException(
+         raise HTTPException( # Versatile exception.
               status_code=404,
               detail="Project not found."
          )
