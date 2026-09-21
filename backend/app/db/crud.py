@@ -8,6 +8,10 @@ from app.schemas.user import UserRead
 from .models import *
 from app.db import models
 
+
+# Users
+#--------------
+
 def create_user(db: Session, name: str, email: str, password_hash: str ) -> User:
     new_user = models.User(
         name=name,
@@ -27,6 +31,9 @@ def get_user_by_id(db: Session, user_id: int):
     stmt = select(User).where(User.id == int(user_id))
     user = db.scalar(stmt)
     return user
+
+# Projects
+#--------------
 
 def create_user_project(db: Session, user_id: int, name: str, description: str | None):
     new_project = models.Project(
@@ -50,3 +57,35 @@ def get_user_project(requested_id: int,user_id: int, db: Session):
     project = db.scalar(stmt)
 
     return project
+
+# Jobs
+#--------------
+def create_project_job(db: Session, 
+                       project_id: int, name: str, 
+                       http_method: str, url: str, timeout_seconds: int):
+
+    new_job = models.Job(
+        project_id = project_id,
+        name = name,
+        http_method=http_method,
+        url=url,
+        timeout_seconds=timeout_seconds
+    )
+    db.add(new_job)
+    db.flush()
+
+    return new_job
+
+def get_project_job(db: Session, user_id: int, 
+                    project_id: int, job_id: int):
+    stmt = select(Job).where(Project.id == project_id, Job.id == job_id, Project.owner_id == user_id)
+    job = db.scalar(stmt)
+
+    return job
+
+def get_all_project_jobs(db: Session, user_id: int,
+                         project_id: int):
+    stmt = select(Project.jobs).where(Project.id == project_id, Project.owner_id == user_id)
+    jobs = db.scalars(stmt).all()
+
+    return jobs

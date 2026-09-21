@@ -51,3 +51,4 @@ def get_project(project_id: int, user = Depends(get_current_user), db: Session =
               detail="Project not found."
          )
     return project
+

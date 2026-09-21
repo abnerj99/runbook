@@ -6,7 +6,7 @@ from .db.database import Base, engine
 from .db.session import get_db, Session
 from sqlalchemy import select
 from .db.models import *
-from .api.routes import runbook, projects
+from .api.routes import runbook, projects, jobs
 
 app = FastAPI()
 
@@ -20,7 +20,7 @@ app.add_middleware(
 )
 app.include_router(runbook.router, prefix="/api")
 app.include_router(projects.router, prefix="/api")
-
+app.include_router(jobs.router, prefix="/api")
 
 @app.get("/api/health")
 def health():
