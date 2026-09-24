@@ -58,7 +58,7 @@ def get_user_project(requested_id: int,user_id: int, db: Session):
 
     return project
 
-# Jobs
+# Jobs / Project Jobs
 #--------------
 def create_project_job(db: Session, 
                        project_id: int, name: str, 
@@ -76,16 +76,15 @@ def create_project_job(db: Session,
 
     return new_job
 
-def get_project_job(db: Session, user_id: int, 
+def get_one_project_job(db: Session, user_id: int, 
                     project_id: int, job_id: int):
-    stmt = select(Job).where(Project.id == project_id, Job.id == job_id, Project.owner_id == user_id)
+    stmt = select(Job).join(Project).where(Project.id == project_id, Job.id == job_id, Project.owner_id == user_id)
     job = db.scalar(stmt)
 
     return job
 
 def get_all_project_jobs(db: Session, user_id: int,
                          project_id: int):
-    stmt = select(Project.jobs).where(Project.id == project_id, Project.owner_id == user_id)
+    stmt = select(Job).join(Project).where(Project.id == project_id, Project.owner_id == user_id)
     jobs = db.scalars(stmt).all()
-
     return jobs
