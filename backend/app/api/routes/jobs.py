@@ -11,7 +11,7 @@ from app.schemas.projects import ProjectCreate, ProjectResponse
 from app.db.crud import create_project_job, create_user_project, get_all_project_jobs, get_all_user_projects, get_one_project_job, get_user_project
 from app.schemas.user import UserRead
 from app.schemas.jobs import *
-
+# Endpoints, Job + JobRun!
 router = APIRouter()
 
 @router.post("/project/{project_id}/jobs", response_model=JobResponse)
@@ -59,3 +59,5 @@ def get_project_jobs(project_id: int, db: Session = Depends(get_db), user: dict 
 def get_project_job(project_id: int, job_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)):
     job = get_one_project_job(db=db, user_id=user.id, project_id=project_id, job_id=job_id)
     return job
+
+

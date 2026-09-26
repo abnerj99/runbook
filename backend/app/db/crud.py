@@ -88,3 +88,10 @@ def get_all_project_jobs(db: Session, user_id: int,
     stmt = select(Job).join(Project).where(Project.id == project_id, Project.owner_id == user_id)
     jobs = db.scalars(stmt).all()
     return jobs
+
+
+# JobRuns
+#-----------------
+
+def create_job_run():
+    pass
