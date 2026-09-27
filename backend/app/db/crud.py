@@ -5,6 +5,7 @@ import email
 from pytest import Session
 from sqlalchemy import select
 from app.schemas.user import UserRead
+from app.schemas import jobs
 from .models import *
 from app.db import models
 
@@ -93,5 +94,28 @@ def get_all_project_jobs(db: Session, user_id: int,
 # JobRuns
 #-----------------
 
-def create_job_run():
+def create_job_run(db: Session, job_id: int, status: str):
+    new_job_run = models.JobRun(
+        job_id = job_id,
+        status = status,
+        
+
+    )
+    db.add(new_job_run)
+    db.commit()
+    db.refresh(new_job_run)
+
+    return new_job_run
+
+def get_job_run(db: Session, job_id: int, job_run_id: int, user_id: int):
+    stmt = select(JobRun).join(Job).join(Project).where(Job.id == job_id, JobRun.id == job_run_id, Project.owner_id == user_id  )
+    job_run = db.scalar(stmt)
+    return job_run
+
+def update_job_run(db: Session, job_id: int, job_run_id: int, user_id):
+    job_run = get_job_run(db = db, 
+                          job_id = job_id, 
+                          job_run_id=job_run_id,
+                          user_id = user_id,
+                            )
     pass

@@ -109,6 +109,7 @@ class Job(Base):
     project: Mapped["Project"] = relationship(
         back_populates="jobs"
     )
+    job_runs: Mapped[list["JobRun"]] = relationship(back_populates="job")
 
 class JobRun(Base):
     __tablename__ = "job_runs"
