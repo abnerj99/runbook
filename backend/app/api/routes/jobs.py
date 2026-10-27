@@ -11,6 +11,8 @@ from app.schemas.projects import ProjectCreate, ProjectResponse
 from app.db.crud import create_job_run, create_project_job, create_user_project, get_all_project_jobs, get_all_user_projects, get_one_project_job, get_user_project
 from app.schemas.user import UserRead
 from app.schemas.jobs import *
+from app.dramatiq.tasks import execute_job
+from app.services.job_runs import start_job_run
 # Endpoints, Job + JobRun!
 router = APIRouter()
 
@@ -22,10 +24,15 @@ def post_project_job(project_id: int, data: JobCreate ,db: Session = Depends(get
             user_id=user.id,
             db=db
         )
+        if project is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Project not found."
+            )
         
         new_job = create_project_job(
             db= db,
-            project_id=data.project_id,
+            project_id=project_id,
             name = data.name,
             http_method=data.http_method,
             url=str(data.url),
@@ -46,7 +53,7 @@ def post_project_job(project_id: int, data: JobCreate ,db: Session = Depends(get
         )
     
 @router.get("/project/{project_id}/jobs", response_model=list[JobResponse])
-def get_project_jobs(project_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)):
+def get_project_jobs(project_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
 
     jobs = get_all_project_jobs(
         db=db,
@@ -56,21 +63,18 @@ def get_project_jobs(project_id: int, db: Session = Depends(get_db), user: dict 
     return jobs
 
 @router.get("/project/{project_id}/jobs/{job_id}")
-def get_project_job(project_id: int, job_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)):
+def get_project_job(project_id: int, job_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     job = get_one_project_job(db=db, user_id=user.id, project_id=project_id, job_id=job_id)
     return job
 
 
 # JobRun.... Hey There.
 #---------------
+# Step 1/5 of JobRun
 @router.post("/jobs/{job_id}/run", response_model=JobRunResponse)
-def post_job_run(job_id: int, db: Session = Depends(get_db), user: dict = Depends(get_current_user)):
-    if not user:
-        raise HTTPException(
-            status_code=403,
-            detail="Unauthorized."
-        )
-    new_job_run = create_job_run(db = db, job_id=job_id, status="RUNNING")
+def post_job_run(job_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    
+    new_job = start_job_run(db = db, job_id = job_id, user_id= user.id)
 
-    return new_job_run
+    return new_job
 
