@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.db.crud import create_job_run, get_job_by_ids, get_one_project_job, update_job_run_failed, update_job_run_success
+from app.db.crud import *
 from app.db.models import Job, JobRun, JobStatus
 from app.dramatiq.tasks import execute_job
 
@@ -14,7 +14,7 @@ def start_job_run(db: Session, job_id: int, user_id: int):
             detail="Job not found."
         )
     
-    new_job_run = create_job_run( # Create JobRun DB Row
+    new_job_run = create_job_run( 
         db=db,
         job_id=job_id,
         status=JobStatus.RUNNING

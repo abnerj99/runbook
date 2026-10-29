@@ -1,10 +1,9 @@
 import time
 import dramatiq
 import httpx
-from sqlalchemy.orm import Session
 from app.dramatiq.queue import broker
 from app.db.database import SessionLocal
-from app.db.models import Job, JobRun, JobStatus
+from app.db.models import Job
 from app.db.crud import get_job, get_one_job_run, update_job_run_failed, update_job_run_success
 
 
