@@ -1,4 +1,5 @@
 from datetime import datetime
+from turtle import back
 from .database import Base
 from enum import Enum
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func, null, true, Enum as SQLENum
@@ -11,6 +12,14 @@ class HTTPMethod(str, Enum):
     PATCH = "PATCH"
     DELETE = "DELETE"
 
+class JobStatus(str, Enum):
+    QUEUED = "QUEUED"
+    RUNNING = "RUNNING"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    RETRYING = "RETRYING"
+    CANCELLED = "CANCELLED"
+    TIMED_OUT = "TIMED_OUT"
 
 class User(Base):
     __tablename__ = "users"
@@ -100,3 +109,37 @@ class Job(Base):
     project: Mapped["Project"] = relationship(
         back_populates="jobs"
     )
+    job_runs: Mapped[list["JobRun"]] = relationship(back_populates="job")
+
+class JobRun(Base):
+    __tablename__ = "job_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
+    status: Mapped[JobStatus] = mapped_column(
+        SQLENum(JobStatus, name="status"),
+        nullable=False
+    )
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+        )
+    
+    finished_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+        )
+
+    status_code: Mapped[int | None] = mapped_column(nullable=True)
+
+    duration_ms: Mapped[int | None] = mapped_column(nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    job: Mapped["Job"] = relationship(back_populates="job_runs")

@@ -46,8 +46,9 @@ def get_project(project_id: int, user = Depends(get_current_user), db: Session =
             db=db
     )
     if project is None:
-         raise HTTPException( # Versatile exception.
+         raise HTTPException( 
               status_code=404,
               detail="Project not found."
          )
     return project
+
