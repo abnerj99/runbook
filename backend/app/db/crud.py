@@ -1,6 +1,5 @@
 
 
-import email
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -100,7 +99,7 @@ def get_all_project_jobs(db: Session, user_id: int,
 
 # JobRuns
 #-----------------
-# Step 3/5 of JobRun
+# Step 3/5 of JobRun -> Next: dramatiq/tasks.py
 def create_job_run(db: Session, job_id: int, status: str):
     new_job_run = models.JobRun(
         job_id = job_id,
@@ -123,23 +122,24 @@ def get_job(db: Session, job_id):
 def get_one_job_run(db: Session, job_run_id: int):
     return db.get(JobRun, job_run_id)
 
-def update_job_run_success(db: Session, job_run: JobRun, status_code):
+def update_job_run_success(db: Session, job_run: JobRun, status_code, duration_ms: int):
     job_run.status = JobStatus.SUCCESS
     job_run.status_code = status_code
     job_run.finished_at = datetime.now(timezone.utc)
-    
+    job_run.duration_ms = duration_ms
     db.commit()
     db.refresh(job_run)
     return job_run
 
     
-def update_job_run_failed(db: Session, job_run: JobRun, error: str ):
+def update_job_run_failed(db: Session, job_run: JobRun, error: str, duration_ms: int | None = None, status_code: int | None = None,):
     # Update Job Run! 
     # ...
     job_run.status=JobStatus.FAILED
-    # job_run.status_code=status_code
+    job_run.status_code=status_code
     job_run.finished_at = datetime.now(timezone.utc)
     job_run.error_message = error
+    job_run.duration_ms = duration_ms
 
     db.commit()
     db.refresh(job_run)
